@@ -7,6 +7,8 @@ const app = express();
 // register view engine
 app.set('view engine', 'ejs');
 
+// middleware
+app.use(morgan('dev'));
 
 // listen for request
 app.listen(3000, () => {
