@@ -6,7 +6,7 @@ const Blog = require('./models/blog');
 const app = express();
 
 // connect to mongoose
-const dbURI = 'mongodb+srv://user:<password>@nodejs-cluster.ej7y0.mongodb.net/note-tuts?retryWrites=true&w=majority';
+const dbURI = 'mongodb+srv://user:Password@nodejs-cluster.ej7y0.mongodb.net/note-tuts?retryWrites=true&w=majority';
 
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
@@ -28,7 +28,11 @@ app.get('/', (req, res) => {
 })
 
 app.get('/blogs', (req, res) => {
-    res.send("all blogs");
+    Blog.find().sort({ createdAt: -1 })
+        .then(result => {
+            res.render('index', { title: 'All Blogs', blogs: result })
+        })
+        .catch(err => console.log(err));
 })
 
 app.get('/blogs/create', (req, res) => {
@@ -38,9 +42,31 @@ app.get('/blogs/create', (req, res) => {
 })
 
 app.post('/blogs', (req, res) => {
-    console.log(req.body);
+    const blog = new Blog(req.body)
+    blog.save()
+        .then(() => {
+            res.redirect('/blogs');
+        })
+        .catch(err => console.log(err));
 })
 
+app.get('/blogs/:id', (req, res) => {
+    const id = req.params.id;
+    Blog.findById(id)
+        .then(result => {
+            res.render('details', { blog: result, title: 'Blog Details' });
+        })
+        .catch(err => console.log(err));
+})
+
+app.delete('/blogs/:id', (req, res) => {
+    const id = req.params.id;
+    Blog.findByIdAndDelete(id)
+        .then(result => {
+            res.json({ redirect: '/blogs' })
+        })
+        .catch(err => console.log(err))
+})
 
 app.get('/about', (req, res) => {
     res.render('about', {
