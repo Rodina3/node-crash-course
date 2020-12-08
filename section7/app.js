@@ -20,6 +20,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 app.set('view engine', 'ejs');
 
 // middleware
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
 // router
